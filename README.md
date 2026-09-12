@@ -1,7 +1,7 @@
 # AgentFlare
 
 <p align="center">
-  <img src="docs/assets/agentflare-km16-pro-codex.png" width="900" alt="An MMD KM16 Pro macro pad used as a visual status display for coding agents">
+  <img src="docs/assets/agentflare-km16-pro-codex.png" width="820" alt="An MMD KM16 Pro macro pad used as a visual status display for coding agents">
 </p>
 
 AgentFlare turns an MMD KM16 Pro macro pad into a small visual status display
@@ -69,7 +69,7 @@ hook activity. It does not observe the Codex window or prove foreground focus.
 Run these commands in Terminal. The standard path below installs prerequisites,
 clones the repository into `~/Developer/agentflare`, then starts AgentFlare.
 
-1. Install Apple’s command-line tools and Homebrew if needed.
+1. **Install Apple’s command-line tools and Homebrew if needed.**
 
    ```bash
    xcode-select --install
@@ -93,7 +93,7 @@ clones the repository into `~/Developer/agentflare`, then starts AgentFlare.
    Expected result: all version commands print a version. `scripts/setup.sh` will
    reject a Go version different from the version declared in `go.mod`.
 
-2. Clone or download the repository. With Git, use:
+2. **Clone or download the repository.** With Git, use:
 
    ```bash
    mkdir -p ~/Developer
@@ -106,7 +106,7 @@ clones the repository into `~/Developer/agentflare`, then starts AgentFlare.
    ZIP instead, extract it, open Terminal in that extracted folder, and run
    `pwd` before continuing.
 
-3. Build the software.
+3. **Build the software.**
 
    ```bash
    scripts/setup.sh
@@ -116,7 +116,7 @@ clones the repository into `~/Developer/agentflare`, then starts AgentFlare.
    followed by two binaries in `daemon/bin/`. This step does not access a
    keyboard, install a service, or change firmware.
 
-4. Satisfy the firmware prerequisite if the keyboard still runs stock firmware.
+4. **Satisfy the firmware prerequisite if the keyboard still runs stock firmware.**
 
    Read and complete the owner-operated [firmware guide](firmware/README.md)
    (~15 minutes on macOS, brick risk, second verified backup required).
@@ -124,7 +124,7 @@ clones the repository into `~/Developer/agentflare`, then starts AgentFlare.
    explicitly choose to perform hardware work. Stop here if you do not have a
    verified recovery path.
 
-5. Start the daemon in the foreground.
+5. **Start the daemon in the foreground.**
 
    ```bash
    ./daemon/bin/agentflare daemon
@@ -133,8 +133,8 @@ clones the repository into `~/Developer/agentflare`, then starts AgentFlare.
    Expected result: the daemon remains running in this terminal. Keep it open
    while completing the next steps.
 
-6. In a second Terminal window, return to the same repository and preview then
-   install global Codex hooks.
+6. **Install the global Codex hooks.** In a second Terminal window, return to
+   the same repository and preview then install them.
 
    ```bash
    cd ~/Developer/agentflare
@@ -147,10 +147,10 @@ clones the repository into `~/Developer/agentflare`, then starts AgentFlare.
    preserves unrelated hooks, and backs up an existing configuration only when
    it changes one.
 
-7. Open Codex, review the hook configuration, and trust it through Codex's
-   normal trust flow. Start a small task, cause an approval or input request if
-   appropriate, then let it complete. Expected result: see the lifecycle states
-   in the table above. Check accepted daemon state with:
+7. **Open Codex and trust the hooks.** Review the hook configuration through
+   Codex's normal trust flow. Start a small task, cause an approval or input
+   request if appropriate, then let it complete. Expected result: see the
+   lifecycle states in the table above. Check accepted daemon state with:
 
    ```bash
    ./daemon/bin/agentflare status --v2 --json
