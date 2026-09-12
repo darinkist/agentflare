@@ -167,7 +167,8 @@ not in addition to them, to avoid duplicate events:
 uv run --locked --project integrations/codex python integrations/codex/install.py --mode project --project /path/to/project
 ```
 
-Login autostart is optional. Stop the foreground daemon before enabling it, then
+Login autostart is optional. Stop the foreground daemon (Ctrl-C, which restores
+LED state; closing the window skips cleanup) before enabling it, then
 install the launchd job:
 
 ```bash
@@ -195,6 +196,9 @@ The installer defaults to 35% key and 25% underglow brightness and accepts
   was lost.
 - **No physical colour:** normal tests do not probe HID. Verify USB mode and the
   firmware support boundary in the [firmware guide](firmware/README.md).
+- **Keys dead on patched firmware but LEDs answer:** stop the daemon and test
+  typing with it stopped before anything else. See the isolation rows in the
+  [firmware guide](firmware/README.md).
 
 ## Further reading
 

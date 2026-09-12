@@ -232,6 +232,7 @@ export DFU_SELECTOR='<VID:PID>'
 export DFU_APP_ALT='<ALT>'
 export READBACK="firmware/builds-local/km16-readback-full.bin"
 export READBACK_PATCH="firmware/builds-local/km16-readback-patch-region.bin"
+rm -f "$READBACK" "$READBACK_PATCH"
 dfu-util -d "$DFU_SELECTOR" -a "$DFU_APP_ALT" -U "$READBACK"
 stat -f%z "$READBACK"
 dd if="$READBACK" of="$READBACK_PATCH" bs=1 count=57344
@@ -242,6 +243,11 @@ Expected result: `READBACK` is **122880 bytes**; `READBACK_PATCH` and `PATCH`
 are **57344 bytes**; final line prints `written region matches`. The quirk box
 applies to the full read. The original-firmware hash does not apply after
 flashing. Do not compare the patch directly against the full readback.
+`dfu-util` refuses to overwrite an existing file (`Cannot open file ...
+File exists`) and reports `No DFU capable USB device available` outside
+bootloader mode — in both cases the `stat`/`dd`/`cmp` lines below re-check
+stale files, so do not trust `written region matches`. Delete the stale
+outputs, re-enter bootloader mode, take fresh values, then read again.
 
 ## 8. Run the automatic LED self-test
 
@@ -309,6 +315,7 @@ export DFU_APP_ALT='<ALT>'
 export VERIFY="firmware/builds-local/km16-restore-verify.bin"
 export VERIFY_CODE="firmware/builds-local/km16-restore-verify-code.bin"
 export RESTORE_CODE="firmware/builds-local/km16-restore-code.bin"
+rm -f "$VERIFY" "$VERIFY_CODE" "$RESTORE_CODE"
 dfu-util -d "$DFU_SELECTOR" -a "$DFU_APP_ALT" -U "$VERIFY"
 stat -f%z "$VERIFY"
 dd if="$VERIFY" of="$VERIFY_CODE" bs=1 count=57344
@@ -340,6 +347,8 @@ repeat a write to "fix" an uncertain one — restore once per step 9, then verif
 | LED stays on after `demo`/`hold`/`walk` | Should no longer happen (LEDs reset to black first); older script version | Update the script; switch off manually with `--execute off <index>` |
 | Readback region mismatch | Write did not stick | Stop; restore per step 9, then verify |
 | Snapshot verdict right after flashing stock | Boot-rewritten settings bytes, not a bad flash | Re-run with `--reference` pointing at the flashed file; `patch region intact` means stock code |
+| Keys dead on patched firmware but LED self-test ACKs | HID interaction or settings/keymap storage, not the LED hooks | Stop the daemon, test typing with the daemon stopped. Keys back means daemon interaction; still dead means restore per step 9 with no extra writes, and keep the readback as evidence |
+| No physical colour on stock with daemon running | Expected: individual LED control exists only on the Direct-LED patch | Not a failure. `status --v2 --json` confirms the accepted socket state only, never physical LEDs |
 
 ## Licence
 

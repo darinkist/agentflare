@@ -56,6 +56,18 @@ Use another terminal for read-only status checks:
 The daemon logs to stderr when run in the foreground. Press Ctrl-C to stop it
 cleanly.
 
+## Foreground versus background
+
+- Foreground: `./daemon/bin/agentflare daemon`, stop with Ctrl-C. A clean
+  exit switches LEDs off and restores the previous matrix effect when the
+  session is healthy; closing the window instead kills it without cleanup,
+  so the last colours can stay latched with the matrix paused.
+- Background: `daemon/launchd/install.sh` installs and starts the login job;
+  `daemon/launchd/uninstall.sh` stops and removes it. Stop the foreground
+  daemon before enabling autostart.
+- `status --v2 --json` confirms the accepted socket state only. It never
+  proves physical LEDs updated; verify those separately.
+
 ## Useful manual commands
 
 These commands send lifecycle or display requests to an already running daemon:
