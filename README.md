@@ -1,7 +1,7 @@
 # AgentFlare
 
 <p align="center">
-  <img src="docs/assets/agentflare-km16-pro-codex.png" width="820" alt="An MMD KM16 Pro macro pad used as a visual status display for coding agents">
+  <img src="docs/assets/agentflare-km16-pro-codex.png" width="650" alt="An MMD KM16 Pro macro pad used as a visual status display for coding agents">
 </p>
 
 AgentFlare turns an MMD KM16 Pro macro pad into a small visual status display
