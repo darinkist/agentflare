@@ -1,0 +1,20 @@
+[project]
+name = "agentflare-codex"
+version = "0.1.0"
+description = "Codex lifecycle hook bridge for AgentFlare"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "AgentFlare contributors" }]
+classifiers = ["License :: OSI Approved :: MIT License"]
+
+[project.scripts]
+agentflare-codex = "agentflare_codex.cli:main"
+
+[build-system]
+requires = ["uv_build==0.8.22"]
+build-backend = "uv_build"
+
+[tool.uv]
+package = true
+required-version = "==0.8.22"

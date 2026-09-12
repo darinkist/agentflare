@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.8.22'
+      - name: Sync Codex bridge package
+        run: uv sync --locked --project integrations/codex
+      - name: Go formatting
+        run: test -z "$(find daemon -name '*.go' -type f -exec gofmt -l {} +)"
+      - name: Build
+        run: go build ./...
+      - name: Go tests
+        env:
+          AGENTFLARE_CODEX_PYTHON: ${{ github.workspace }}/integrations/codex/.venv/bin/python
+        run: go test ./...
+      - name: Vet
+        run: go vet ./...
+      - name: Race tests
+        env:
+          AGENTFLARE_CODEX_PYTHON: ${{ github.workspace }}/integrations/codex/.venv/bin/python
+        run: go test -race ./...
+      - name: Python bridge package and firmware tests
+        run: |
+          uv run --locked --project integrations/codex python -m unittest discover -s integrations/codex/tests
+          uv build --project integrations/codex
+          uv run --locked --project integrations/codex python -c 'import tarfile, zipfile; from pathlib import Path; expected = {"agentflare_codex/__init__.py", "agentflare_codex/cli.py", "agentflare_codex/config.py", "agentflare_codex/events.py", "agentflare_codex/protocol.py", "agentflare_codex/session.py", "agentflare_codex/storage.py", "agentflare_codex/worker.py"}; wheel = next(Path("integrations/codex/dist").glob("*.whl")); sdist = next(Path("integrations/codex/dist").glob("*.tar.gz")); assert {name for name in zipfile.ZipFile(wheel).namelist() if name.startswith("agentflare_codex/") and name.endswith(".py")} == expected; assert {name.split("/", 1)[1] for name in tarfile.open(sdist).getnames() if "/src/agentflare_codex/" in name and name.endswith(".py")} == {"src/" + name for name in expected}'
+          wheel_env="$RUNNER_TEMP/agentflare-codex-wheel"
+          uv venv --python 3.12 "$wheel_env"
+          uv pip install --python "$wheel_env/bin/python" --no-index integrations/codex/dist/*.whl
+          (cd "$RUNNER_TEMP" && "$wheel_env/bin/python" -c 'import agentflare_codex, agentflare_codex.cli; assert agentflare_codex.__version__ == "0.1.0"')
+          install_checkout="$RUNNER_TEMP/agentflare-codex-checkout"
+          cp -R integrations/codex "$install_checkout"
+          rm -rf "$install_checkout/.venv" "$install_checkout/dist" "$install_checkout/__pycache__" "$install_checkout/src/agentflare_codex/__pycache__" "$install_checkout/tests/__pycache__"
+          uv sync --locked --project "$install_checkout"
+          install_home="$RUNNER_TEMP/agentflare-codex-home"
+          uv run --locked --project "$install_checkout" python "$install_checkout/install.py" --mode global --codex-home "$install_home"
+          hook_python="$(uv run --locked --project "$install_checkout" python -c 'import sys; print(getattr(sys, "_base_executable", sys.executable))')"
+          (cd "$RUNNER_TEMP" && env AGENTFLARE_CODEX_HOOK_STATE_DIR="$RUNNER_TEMP/agentflare-codex-state" AGENTFLARE_CODEX_HOOK_LOG="$RUNNER_TEMP/agentflare-codex-events.jsonl" "$hook_python" -B "$install_home/agentflare_bridge.py" <<'JSON'
+          {"hook_event_name":"SubagentStop","session_id":"ci-session","turn_id":"ci-turn","agent_id":"ci-agent","agent_type":"worker"}
+          JSON
+          )
+          rm -rf "$install_checkout" "$install_home"
+          uv run --locked --project integrations/codex python -B firmware/tools/test_build_direct_led.py
+          uv run --locked --project integrations/codex python -B firmware/tools/test_control_direct_led.py
+      - name: launchd plist generation
+        run: zsh daemon/launchd/test_install.sh

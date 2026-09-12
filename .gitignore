@@ -1,0 +1,66 @@
+# Generated binaries, including daemon/bin/
+bin/
+coverage.out
+
+# macOS
+.DS_Store
+
+# Local runtime state
+runtime/
+
+# Python hook tests
+__pycache__/
+*.py[cod]
+.venv/
+dist/
+
+# Local-only firmware data. Supported source and documentation are committed;
+# snapshots, evidence, archive material, and built blobs are never committed.
+firmware/backups-local/
+firmware/builds-local/
+firmware/evidence/
+firmware/archive/
+firmware/**/*.bin
+firmware/**/*.elf
+firmware/**/*.hex
+firmware/**/*.o
+
+# Local Codex configuration and hook runtime files
+.codex/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+!.env.*.example
+.envrc
+.netrc
+.npmrc
+.pypirc
+.secrets/
+secrets/
+credentials*.json
+client_secret*.json
+service-account*.json
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Logs and runtime diagnostics
+*.log
+*.jsonl
+
+# Python and tool caches
+.uv-cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Editor-local files
+.idea/
+.vscode/
+*.swp
+*~

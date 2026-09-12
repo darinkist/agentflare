@@ -1,0 +1,12 @@
+{
+  "version": "replay-v1",
+  "source": "replay",
+  "session_id": "demo-session",
+  "capabilities": {"snapshot": true, "live_events": true, "run_identity": true, "waiting_user": true, "terminal": true, "cancellation": true, "liveness": true},
+  "snapshot": {"source_order": 1, "main": {"agent_id": "main", "run_id": "turn-1", "role": "main", "state": "running"}, "subagents": []},
+  "events": [
+    {"event": {"event_id": "subagent-start", "source_order": 2, "run": {"agent_id": "worker", "run_id": "child-1", "role": "subagent", "parent_agent_id": "main", "state": "running"}}},
+    {"event": {"event_id": "approval", "source_order": 3, "run": {"agent_id": "main", "run_id": "turn-1", "role": "main", "state": "waiting_user", "reason": "approval"}}},
+    {"event": {"event_id": "subagent-success", "source_order": 4, "run": {"agent_id": "worker", "run_id": "child-1", "role": "subagent", "parent_agent_id": "main", "state": "succeeded"}}}
+  ]
+}
